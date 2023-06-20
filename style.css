@@ -245,7 +245,6 @@
   .search-area p {
     color: #818A91;
   }
-  
   @media (max-width: 768px) {
     .search-area {
       -webkit-box-orient: vertical;
@@ -259,7 +258,7 @@
   }
   
   .regionSearch {
-    width: 27.5%;
+    width: 50%;
     min-height: 38px;
     text-indent: 0.5rem;
     color: #818A91;

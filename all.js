@@ -44,9 +44,12 @@ axios
     data = res.data.data;
     // init下面的卡片範圍
     const ticketCard_area = document.querySelector(".ticketCard-area");
-
+    // searchResult number
+    const searchResult = document.querySelector('#searchResult-text');
+    
     function init() {
       let str = "";
+      let searchResult_num = 0;
       data.forEach(function (item) {
         str += `<li class="ticketCard">
             <div class="ticketCard-img">
@@ -74,8 +77,10 @@ axios
               </div>
             </div>
           </li>`;
+        searchResult_num++;
       });
       ticketCard_area.innerHTML = str;
+      searchResult.innerHTML = `本次搜尋共 ${searchResult_num} 筆資料`;
     }
 
     const ticketName = document.querySelector("#ticketName");
@@ -118,16 +123,19 @@ axios
     addTicket.addEventListener("click", function (e) {
       addData();
       init();
+      renderC3();
     });
     // 地圖搜尋
     const regionSearch = document.querySelector(".regionSearch");
+    
     regionSearch.addEventListener("change", function (e) {
       if (e.target.value == undefined) {
         return;
       }
       let str = "";
+      let searchResult_num = 0;
       data.forEach(function (item) {
-        if (e.target.value === "全部地區") {
+        if (e.target.value === "") {
           str += `<li class="ticketCard">
             <div class="ticketCard-img">
               <a href="#">
@@ -154,6 +162,7 @@ axios
               </div>
             </div>
           </li>`;
+          searchResult_num++;
         } else if (e.target.value === item.area) {
           str += `<li class="ticketCard">
             <div class="ticketCard-img">
@@ -181,13 +190,50 @@ axios
               </div>
             </div>
           </li>`;
+          searchResult_num++;
         }
       });
       ticketCard_area.innerHTML = str;
+      searchResult.innerHTML = `本次搜尋共 ${searchResult_num} 筆資料`;
     });
-
+    // 執行
     init();
+    renderC3();
   })
   .catch(function (err) {
     console.log(err.data);
   });
+
+function renderC3() {
+  let obj = [];
+  data.forEach(function(item){
+    if(obj[item.area]== undefined) {
+      obj[item.area] = 1;
+    } else {
+      obj[item.area] ++;
+    }
+  })
+  let newData = [];
+  let area = Object.keys(obj);
+  area.forEach(function(item) {
+    let arr = [];
+    arr.push(item);
+    arr.push(obj[item]);
+    newData.push(arr);
+  })
+  // C3
+  let chart = c3.generate({
+    bindto: '#chart', // HTML 元素綁定
+    data: {
+      columns: newData, // 資料存放
+      type:"pie" // 圖表種類
+    },
+    size: {
+      height: 200,
+      width: 200
+    },
+    pie: {
+      title: "地區"
+    }
+});
+}
